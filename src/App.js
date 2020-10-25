@@ -143,7 +143,7 @@ function App() {
 
   return (
     <div className="App">
-      <Header as="h1">Lol try not to fail econ</Header>
+      <Header as="h1">Engineering Econ Calculator</Header>
 
       <div>
         Interest rate (MARR or inflation or whatever):{" "}
