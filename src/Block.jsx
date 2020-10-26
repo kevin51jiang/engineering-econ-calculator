@@ -18,16 +18,16 @@ const Block = ({ block, setBlock, maxTime }) => {
       hidden: false,
     };
 
-    if (blockForm === "FW") {
+    if (blockForm === "PW") {
+      newBlock = {
+        ...newBlock,
+        form: "PW",
+      };
+    } else if (blockForm === "FW") {
       newBlock = {
         ...newBlock,
         form: "FW",
         date: 1,
-      };
-    } else if (blockForm === "PW") {
-      newBlock = {
-        ...newBlock,
-        form: "PW",
       };
     } else if (blockForm === "A") {
       newBlock = {
@@ -91,8 +91,8 @@ const Block = ({ block, setBlock, maxTime }) => {
 
       <Checkbox
         toggle
-        defaultChecked={true}
-        value={!block.hidden}
+        // defaultChecked={true}
+        checked={!block.hidden}
         label="Display dataset"
         onChange={(e, { checked }) => setBlock({ ...block, hidden: !checked })}
       />

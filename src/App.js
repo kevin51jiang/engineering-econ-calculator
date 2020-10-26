@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import logo from "./logo.svg";
-import FactorForms from "./FactorForms";
 import Block from "./Block";
 import "semantic-ui-css/semantic.min.css";
 import "./index.css";
@@ -44,7 +42,7 @@ function App() {
     // array of datasets
     let newData = [];
 
-    blocks.map((block, ind) => {
+    blocks.forEach((block, ind) => {
       const defaultBlockOptions = {
         backgroundColor: block?.color || `${randomColor()}`,
         hidden: block.hidden,
@@ -94,18 +92,32 @@ function App() {
           // [0, ..., 0, amt, amt + increase, amt + 2* increase, ...]
           data: ((block) => {
             // create just the [amt, amt + increase, ... ] part
-            const interestingPart = Array(block?.end - block?.start)
+            const interestingPart = Array(block?.end - block?.start + 1)
               .fill(0)
               .map(
                 (_, ind) =>
                   Number(block?.amt) + ind * Number(block?.increase) || 0
               );
 
+            console.log(
+              "Number(block?.start) || timePeriod || 0",
+              Number(block?.start) || timePeriod || 0
+            );
+            console.log(
+              "Array((timePeriod - block.end) || 0",
+              timePeriod - Number(block.end) || 0
+            );
+            console.log("timePeriod", timePeriod);
+            console.log("block.end", block.end);
+
             // pad it with 0s on either side as needed
-            return Array(Number(block?.start))
+            return Array(Number(block?.start) || timePeriod || 0)
               .fill(0)
               .concat(interestingPart)
-              .concat(Array(timePeriod - block.end).fill(0));
+              .concat(
+                Array(Math.max(timePeriod - block.end, 0)) // make sure there can't be negative length array
+                  .fill(0)
+              );
           })(block),
         });
       } else if (block.form === "GG") {
@@ -116,7 +128,9 @@ function App() {
           // [0, amt, amt * (1+growth)^1, amt * (1+growth)^2, ...]
           data: ((block) => {
             // create just the [ amt, amt * (1+growth)^1, amt * (1+growth)^2] part
-            const interestingPart = Array(block?.end - block?.start)
+            const interestingPart = Array(
+              block?.end - block?.start + 1 || timePeriod || 0
+            )
               .fill(0)
               .map(
                 (_, ind) =>
@@ -128,7 +142,10 @@ function App() {
             return Array(Number(block?.start))
               .fill(0)
               .concat(interestingPart)
-              .concat(Array(timePeriod - block.end).fill(0));
+              .concat(
+                Array(Math.max(timePeriod - block.end, 0)) // make sure there can't be negative length array
+                  .fill(0)
+              );
           })(block),
         });
       }
@@ -198,7 +215,7 @@ function App() {
 
       <Segment.Group>
         {blocks.map((block, ind) => (
-          <Segment>
+          <Segment key={"seg-" + ind}>
             <Block
               maxTime={timePeriod}
               desired={reqForm}
@@ -214,7 +231,11 @@ function App() {
       </Segment.Group>
 
       <div style={{ width: "640px", height: "360px" }}>
-        <Bar ref={chartRef} data={chartData} options={chartOptions} />
+        <Bar
+          ref={chartRef}
+          data={chartData}
+          options={{ ...chartOptions, maintainAspectRatio: false }}
+        />
       </div>
     </div>
   );

@@ -33,6 +33,8 @@ export const factorFormResults = factorForms.filter((val) =>
 
 export const chartOptions = {
   maintainAspectRatio: false,
+  width: 640,
+  height: 1000,
   title: {
     display: true,
     text: "Cashflow diagram",

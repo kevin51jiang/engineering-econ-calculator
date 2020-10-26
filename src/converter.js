@@ -28,38 +28,38 @@ const AGivenAG = (data) => {
 // probably won't be supported for a while
 const PGivenAInfinite = (data) => data.annuity / data.interest;
 
-
 const convertToP = (data) => {
   let res;
   switch (data.form) {
-    case 'A':
-      res = PGivenA(data)
+    case "A":
+      res = PGivenA(data);
       break;
-    case 'F':
-      res = PGivenF(data)
+    case "F":
+      res = PGivenF(data);
       break;
-    case 'AG':
-      res = PGivenGG(data)
+    case "AG":
+      res = PGivenGG(data);
       break;
-    case P:
+    case "P":
       res = data;
       break;
   }
 
   if (!res) {
-    throw `Invalid form of: ${data.form}`
+    throw `Invalid form of: ${data.form}`;
   }
 
   // make sure that they only have p attributes
-  return { ...data, form: 'P', factor: res }
-}
+  return { ...data, form: "P", factor: res };
+};
 
-/** 
+/**
  * Old, req should show the stuff changing.
  * Req should only show the attributes that need to change e.g. period.
  */
-export default convertForms = (data, changesToMake) => {
+const converter = (data, changesToMake) => {
   // data should include:
+  // amt
   // form
   // interest rate
   // growth
@@ -67,19 +67,38 @@ export default convertForms = (data, changesToMake) => {
   // start
   // end
   // annuity (1)
-    
-  //   //in order to change, might need to change period first
-  //   //in order to change period, will need to convert to present
-  // if (changesToMake.form) {
-  //   // in order to change form, need to change period first
-  //   // in order to change period, convert to present
-  //   let converted = [...data];
-  //   if (data.start !== 0 || data.end !== periods) {
-  //     converted = 
-  //   }
-  // }
-  
-  
-  // look for what to change first
-  
+
+  // Currently, assume that everything will needed to be converted to present value
+  switch (data.form) {
+    case "PW":
+      // nothing needs to change for stuff that's already PW
+      return { data: data, steps: [] };
+    case "FW":
+      // need to calculate conversion factor, then apply
+      const factor = PGivenF(data);
+      return {
+        data: {
+          amt: factor * data.amt,
+        },
+        steps: [
+          {
+            name: "P/F", // to look up formula later for display
+            factor: factor, // for final result
+            data: data, // for snapshot in time
+          },
+        ],
+      };
+      break;
+    case "A":
+      // need to calculate conversion factor, then apply
+      break;
+    case "AG":
+      // need to calculate conversion factor, then apply
+      break;
+    case "GG":
+      // need to calculate conversion factor, then apply
+      break;
+  }
 };
+
+export default converter;

@@ -1,6 +1,6 @@
 import React from "react";
 import { Dropdown } from "semantic-ui-react";
-import { factorForms } from "./consts";
+// import { factorForms } from "./consts";
 
 const factorOptions = [
   {
