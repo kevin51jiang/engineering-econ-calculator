@@ -7,10 +7,11 @@ import GGProps from "./factorForms/GGProps";
 import PWProps from "./factorForms/PWProps";
 import FWProps from "./factorForms/FWProps";
 import randomColor from "randomcolor";
+import converter from "./converter";
 
-const Block = ({ block, setBlock, maxTime }) => {
+const Block = ({ block, setBlock, maxTime, interestRate }) => {
   const [blockForm, setBlockForm] = useState("PW");
-
+  const [converted, setConverted] = useState({});
   useEffect(() => {
     let newBlock = {
       amt: "",
@@ -33,6 +34,8 @@ const Block = ({ block, setBlock, maxTime }) => {
       newBlock = {
         ...newBlock,
         form: "A",
+        start: 1,
+        end: maxTime,
       };
     } else if (blockForm === "AG") {
       newBlock = {
@@ -55,6 +58,11 @@ const Block = ({ block, setBlock, maxTime }) => {
     setBlock(newBlock);
   }, [blockForm]);
 
+  // calculations
+  useEffect(() => {
+    setConverted(converter({ ...block, interest: interestRate }));
+  }, [block, interestRate]);
+
   return (
     <div
     // style={{
@@ -64,7 +72,7 @@ const Block = ({ block, setBlock, maxTime }) => {
       <span
         style={{ width: "10%", height: "90%", backgroundColor: block.color }}
       >
-        This is a color
+        Title of cashflow entry
       </span>
       <div>
         I have a{" "}
@@ -76,11 +84,11 @@ const Block = ({ block, setBlock, maxTime }) => {
         that has the following properties:
       </div>
       {blockForm === "FW" ? (
-        <FWProps blockInfo={block} setBlockInfo={setBlock} />
+        <FWProps maxTime={maxTime} blockInfo={block} setBlockInfo={setBlock} />
       ) : blockForm === "PW" ? (
-        <PWProps blockInfo={block} setBlockInfo={setBlock} />
+        <PWProps maxTime={maxTime} blockInfo={block} setBlockInfo={setBlock} />
       ) : blockForm === "A" ? (
-        <AProps blockInfo={block} setBlockInfo={setBlock} />
+        <AProps maxTime={maxTime} blockInfo={block} setBlockInfo={setBlock} />
       ) : blockForm === "AG" ? (
         <AGProps maxTime={maxTime} blockInfo={block} setBlockInfo={setBlock} />
       ) : blockForm === "GG" ? (
@@ -96,6 +104,11 @@ const Block = ({ block, setBlock, maxTime }) => {
         label="Display dataset"
         onChange={(e, { checked }) => setBlock({ ...block, hidden: !checked })}
       />
+
+      <div>
+        <h3>Converted</h3>
+        {JSON.stringify(converted)}
+      </div>
     </div>
   );
 };

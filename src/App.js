@@ -43,7 +43,28 @@ function App() {
     let newData = [];
 
     blocks.forEach((block, ind) => {
+      // skip over invalid inputs
+      // if (
+      //   block.start < 0 ||
+      //   block.end > timePeriod ||
+      //   block.end - block.start < 0
+      // ) {
+      //   return;
+      // }
+
+      
+      if (!isNaN(block.end)) {
+        console.log("lol out")
+        return;
+      }
+
+      console.log(
+        '!isFinite(block.end) && block.end !== "end"',
+        !isFinite(block.end) && block.end !== "end"
+      );
+
       const defaultBlockOptions = {
+        end: block?.end === "end" ? timePeriod : block?.end,
         backgroundColor: block?.color || `${randomColor()}`,
         hidden: block.hidden,
       };
@@ -217,6 +238,7 @@ function App() {
         {blocks.map((block, ind) => (
           <Segment key={"seg-" + ind}>
             <Block
+              interestRate={interestRate}
               maxTime={timePeriod}
               desired={reqForm}
               block={block}

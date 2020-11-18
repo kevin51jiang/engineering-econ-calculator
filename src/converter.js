@@ -1,22 +1,36 @@
+// formulas from
+// https://staff.emu.edu.tr/gokhanizbirak/Documents/courses/ieng323-mane323/assignments-homeworks/Formulas-Engineering-Economy.pdf
+
 const AGivenF = (data) => {
-  return data.interest / (Math.pow(1 + data.interest, data.periods) - 1);
+  return data.interest / (Math.pow(1 + data.interest, data.date) - 1);
 };
 const FGivenA = (data) => 1 / AGivenF(data);
 
 const AGivenP = (data) => {
-  const nthPaymentReciprocal = Math.pow(1 + data.interest, data.periods);
+  const nthPaymentReciprocal = Math.pow(
+    1 + data.interest,
+    data.end - data.start
+  );
   return (data.interest * nthPaymentReciprocal) / (nthPaymentReciprocal - 1);
 };
 
 const PGivenA = (data) => 1 / AGivenP(data);
 
 const FGivenP = (data) => {
-  return Math.pow(1 + data.interest, data.periods);
+  return Math.pow(1 + data.interest, data.date);
 };
 
 const PGivenF = (data) => 1 / FGivenP(data);
 
 const PGivenGG = (data) => PGivenA(data) / (1 + data.growth);
+
+const PGivenAG = ({ amt, start, end, increase, interest }) => {
+  const n = end - start;
+  return (
+    (increase * (Math.pow(1 + interest, n) - interest * n - 1)) /
+    (Math.pow(interest, 2) * Math.pow(1 + interest, n))
+  );
+};
 
 const AGivenAG = (data) => {
   return (
@@ -67,37 +81,77 @@ const converter = (data, changesToMake) => {
   // start
   // end
   // annuity (1)
+  const convertable = { ...data, interest: data.interest / 100 };
 
   // Currently, assume that everything will needed to be converted to present value
-  switch (data.form) {
+  switch (convertable.form) {
     case "PW":
       // nothing needs to change for stuff that's already PW
-      return { data: data, steps: [] };
+      return { data: convertable, steps: [] };
     case "FW":
       // need to calculate conversion factor, then apply
-      const factor = PGivenF(data);
+      const fwFactor = PGivenF(convertable);
+      console.log("fwFactor", fwFactor);
       return {
         data: {
-          amt: factor * data.amt,
+          // this datapoint will keep getting mutated every step
+          amt: fwFactor * convertable.amt,
         },
         steps: [
+          // insert a new "step" in the array every time a new conversion op is done
           {
-            name: "P/F", // to look up formula later for display
-            factor: factor, // for final result
-            data: data, // for snapshot in time
+            name: "(P/F, i, n)", // to look up formula later for display
+            factor: fwFactor, // for final result
+            data: convertable, // for snapshot in time
           },
         ],
       };
-      break;
+
     case "A":
       // need to calculate conversion factor, then apply
-      break;
+      const aFactor = PGivenA(convertable);
+      return {
+        data: {
+          amt: aFactor * convertable.amt,
+        },
+        steps: [
+          {
+            name: "(P/A, i, n)", // to look up formula later for display
+            factor: aFactor, // for final result
+            data: convertable, // for snapshot in time
+          },
+        ],
+      };
     case "AG":
       // need to calculate conversion factor, then apply
-      break;
+      const agFactor = PGivenAG(convertable);
+      return {
+        data: {
+          amt: agFactor * convertable.amt,
+        },
+        steps: [
+          {
+            name: "(P/G, i, n)", // to look up formula later for display
+            factor: agFactor, // for final result
+            data: convertable, // for snapshot in time
+          },
+        ],
+      };
     case "GG":
       // need to calculate conversion factor, then apply
-      break;
+      const ggFactor = PGivenGG(convertable);
+      return {
+        data: {
+          amt: ggFactor * convertable.amt,
+        },
+        steps: [
+          {
+            name: "(P/G, g, i, n)", // to look up formula later for display
+            factor: ggFactor, // for final result
+            data: convertable, // for snapshot in time
+          },
+        ],
+      };
   }
 };
 

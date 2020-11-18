@@ -6,11 +6,15 @@ const AGProps = ({ maxTime, blockInfo, setBlockInfo }) => {
     <div>
       A linear gradient, starting at period{" "}
       <Input
+        error={blockInfo.start < 0 || blockInfo.start > blockInfo.end}
         defaultValue="1"
-        onChange={(e, { value }) => setBlockInfo({ ...blockInfo, start: value })}
+        onChange={(e, { value }) =>
+          setBlockInfo({ ...blockInfo, start: value })
+        }
       />{" "}
       to{" "}
       <Input
+        error={blockInfo.end > maxTime || blockInfo.start > blockInfo.end}
         defaultValue={maxTime}
         onChange={(e, { value }) => setBlockInfo({ ...blockInfo, end: value })}
       />

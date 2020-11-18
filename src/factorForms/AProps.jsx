@@ -1,7 +1,7 @@
 import React from "react";
 import { Input } from "semantic-ui-react";
 
-const AProps = ({ blockInfo, setBlockInfo }) => {
+const AProps = ({ maxTime, blockInfo, setBlockInfo }) => {
   return (
     <div>
       Gain of{" "}
@@ -9,7 +9,18 @@ const AProps = ({ blockInfo, setBlockInfo }) => {
         label="$"
         onChange={(e, { value }) => setBlockInfo({ ...blockInfo, amt: value })}
       />{" "}
-      every period starting at period 1.
+      starting at period{" "}
+      <Input
+        defaultValue="1"
+        onChange={(e, { value }) =>
+          setBlockInfo({ ...blockInfo, start: value })
+        }
+      />{" "}
+      to{" "}
+      <Input
+        defaultValue={maxTime}
+        onChange={(e, { value }) => setBlockInfo({ ...blockInfo, end: value })}
+      />
     </div>
   );
 };
